@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Pacientes, Médicos e Consultas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    section {
+      margin-bottom: 40px;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+    }
+    .resposta {
+      margin-top: 10px;
+      background-color: #f3f3f3;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sistema de Cadastro e Agendamento</h1>
+
+  <!-- TOKEN -->
+  <section>
+    <h2>Token</h2>
+    <label for="token">Cole aqui o token:</label>
+    <input type="text" id="token">
+  </section>
+
+  <!-- PACIENTE -->
+  <section>
+    <h2>Cadastrar Paciente</h2>
+    <form id="formPaciente">
+      <label>Nome</label><input id="p_nome" required>
+      <label>CPF</label><input id="p_cpf" required>
+      <label>Data de Nascimento</label><input id="p_data" required>
+      <label>Telefone</label><input id="p_telefone" required>
+      <label>Email</label><input id="p_email" required>
+      <button type="submit">Cadastrar Paciente</button>
+    </form>
+    <div id="resPaciente" class="resposta"></div>
+  </section>
+
+  <!-- MÉDICO -->
+  <section>
+    <h2>Cadastrar Médico</h2>
+    <form id="formMedico">
+      <label>Nome</label><input id="m_nome" required>
+      <label>CRM</label><input id="m_crm" required>
+      <label>Especialidade</label><input id="m_esp" required>
+      <label>Email</label><input id="m_email" required>
+      <label>Telefone</label><input id="m_telefone" required>
+      <button type="submit">Cadastrar Médico</button>
+    </form>
+    <div id="resMedico" class="resposta"></div>
+  </section>
+
+  <!-- CONSULTA -->
+  <section>
+    <h2>Agendar Consulta</h2>
+    <form id="formConsulta">
+      <label>ID do Paciente</label><input id="c_paciente" required>
+      <label>ID do Médico</label><input id="c_medico" required>
+      <label>Data e Hora (AAAA-MM-DD HH:MM:SS)</label><input id="c_data" required>
+      <label>Motivo</label><input id="c_motivo" required>
+      <button type="submit">Agendar Consulta</button>
+    </form>
+    <div id="resConsulta" class="resposta"></div>
+  </section>
+
+  <script>
+    const tokenInput = document.getElementById('token');
+
+    function getHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + tokenInput.value
+      };
+    }
+
+    document.getElementById('formPaciente').addEventListener('submit', e => {
+      e.preventDefault();
+      fetch('./routes/pacientes.php', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({
+          nome: document.getElementById('p_nome').value,
+          cpf: document.getElementById('p_cpf').value,
+          data_nascimento: document.getElementById('p_data').value,
+          telefone: document.getElementById('p_telefone').value,
+          email: document.getElementById('p_email').value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('resPaciente').innerText = JSON.stringify(data, null, 2);
+      });
+    });
+
+    document.getElementById('formMedico').addEventListener('submit', e => {
+      e.preventDefault();
+      fetch('./routes/medicos.php', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({
+          nome: document.getElementById('m_nome').value,
+          crm: document.getElementById('m_crm').value,
+          especialidade: document.getElementById('m_esp').value,
+          email: document.getElementById('m_email').value,
+          telefone: document.getElementById('m_telefone').value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('resMedico').innerText = JSON.stringify(data, null, 2);
+      });
+    });
+
+    document.getElementById('formConsulta').addEventListener('submit', e => {
+      e.preventDefault();
+      fetch('./routes/consultas.php', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({
+          id_paciente: document.getElementById('c_paciente').value,
+          id_medico: document.getElementById('c_medico').value,
+          data_hora: document.getElementById('c_data').value,
+          motivo: document.getElementById('c_motivo').value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('resConsulta').innerText = JSON.stringify(data, null, 2);
+      });
+    });
+  </script>
+</body>
+</html>

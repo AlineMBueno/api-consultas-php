@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Agendar Consulta</title>
+</head>
+<body>
+  <h2>Agendar Consulta</h2>
+
+  <form id="formConsulta">
+    <label for="id_paciente">ID do Paciente:</label>
+    <input type="number" id="id_paciente" required><br><br>
+
+    <label for="id_medico">ID do Médico:</label>
+    <input type="number" id="id_medico" required><br><br>
+
+    <label for="data_hora">Data e Hora (AAAA-MM-DD HH:MM:SS):</label>
+    <input type="text" id="data_hora" placeholder="2025-07-01 10:00:00" required><br><br>
+
+    <label for="motivo">Motivo:</label>
+    <input type="text" id="motivo" required><br><br>
+
+    <label for="token">Token (copie do Postman):</label>
+    <input type="text" id="token" required><br><br>
+
+    <button type="submit">Agendar</button>
+  </form>
+
+  <div id="resposta" style="margin-top: 20px;"></div>
+
+  <script>
+    document.getElementById('formConsulta').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const dados = {
+        id_paciente: document.getElementById('id_paciente').value,
+        id_medico: document.getElementById('id_medico').value,
+        data_hora: document.getElementById('data_hora').value,
+        motivo: document.getElementById('motivo').value
+      };
+
+      const token = document.getElementById('token').value;
+
+      fetch('./routes/consultas.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(dados)
+      })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('resposta').innerText = JSON.stringify(data, null, 2);
+        })
+        .catch(err => {
+          document.getElementById('resposta').innerText = 'Erro: ' + err;
+        });
+    });
+  </script>
+</body>
+</html>
